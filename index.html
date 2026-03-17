@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ethics Quest — Expense Integrity Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0b1437;
+    --navy2: #0f1e4a;
+    --teal: #00c2d4;
+    --teal2: #00e5c0;
+    --gold: #f5c518;
+    --coral: #ff6b6b;
+    --green: #22d98a;
+    --purple: #845ef7;
+    --card-bg: rgba(255,255,255,0.05);
+    --card-border: rgba(255,255,255,0.1);
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--navy);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  /* ── ANIMATED BACKGROUND ── */
+  .bg-stars {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background: 
+      radial-gradient(ellipse at 20% 30%, rgba(0,194,212,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 70%, rgba(132,94,247,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 10%, rgba(245,197,24,0.05) 0%, transparent 40%);
+  }
+  .star { position:fixed; border-radius:50%; background:#fff; animation: twinkle var(--d,3s) infinite alternate; opacity:0; pointer-events:none; }
+  @keyframes twinkle { 0%{opacity:0;transform:scale(0.8)} 100%{opacity:var(--o,0.6);transform:scale(1.2)} }
+
+  /* ── TOP NAV ── */
+  .top-nav {
+    position: fixed; top:0; left:0; right:0; z-index:100;
+    display: flex; align-items:center; justify-content:space-between;
+    padding: 14px 28px;
+    background: rgba(11,20,55,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--card-border);
+  }
+  .nav-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; 
+    background: linear-gradient(135deg, var(--teal), var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .nav-right { display:flex; align-items:center; gap:20px; }
+  .xp-badge { display:flex; align-items:center; gap:8px; background:rgba(245,197,24,0.15); border:1px solid rgba(245,197,24,0.3); border-radius:20px; padding:6px 14px; }
+  .xp-icon { font-size:1rem; }
+  .xp-val { font-family:'Syne',sans-serif; font-weight:700; color:var(--gold); font-size:0.9rem; }
+  .progress-pill { display:flex; align-items:center; gap:8px; }
+  .progress-pill span { font-size:0.8rem; color:var(--text-muted); }
+  .mini-progress { width:100px; height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden; }
+  .mini-progress-fill { height:100%; background:linear-gradient(90deg,var(--teal),var(--teal2)); border-radius:3px; transition:width 0.5s ease; }
+
+  /* ── MAIN WRAPPER ── */
+  .app { position:relative; z-index:1; padding-top:70px; min-height:100vh; }
+
+  /* ── SCREENS ── */
+  .screen { display:none; min-height:calc(100vh - 70px); padding:40px 20px; animation: fadeSlide 0.5s ease; }
+  .screen.active { display:flex; flex-direction:column; align-items:center; }
+  @keyframes fadeSlide { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ── LANDING ── */
+  #screen-welcome { justify-content:center; text-align:center; }
+  .hero-badge { display:inline-block; background:rgba(0,194,212,0.15); border:1px solid rgba(0,194,212,0.4); border-radius:30px; padding:8px 20px; font-size:0.8rem; color:var(--teal); letter-spacing:2px; text-transform:uppercase; margin-bottom:20px; }
+  .hero-title { font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(2rem,5vw,3.5rem); line-height:1.1; margin-bottom:16px; }
+  .hero-title span { background:linear-gradient(135deg,var(--teal),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .hero-sub { font-size:1.05rem; color:var(--text-muted); max-width:500px; margin:0 auto 36px; line-height:1.7; }
+  .name-input-wrap { display:flex; gap:12px; margin-bottom:40px; flex-wrap:wrap; justify-content:center; }
+  .name-input { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:14px 20px; color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-size:1rem; outline:none; width:280px; transition:all 0.3s; }
+  .name-input:focus { border-color:var(--teal); background:rgba(0,194,212,0.08); }
+  .btn-start { background:linear-gradient(135deg,var(--teal),var(--teal2)); border:none; border-radius:12px; padding:14px 36px; color:#0b1437; font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; cursor:pointer; transition:all 0.3s; box-shadow:0 0 30px rgba(0,194,212,0.3); }
+  .btn-start:hover { transform:translateY(-2px); box-shadow:0 0 40px rgba(0,194,212,0.5); }
+  .module-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; max-width:860px; width:100%; }
+  .module-preview { background:var(--card-bg); border:1px solid var(--card-border); border-radius:14px; padding:18px 14px; text-align:center; cursor:pointer; transition:all 0.3s; position:relative; overflow:hidden; }
+  .module-preview::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(0,194,212,0.05),transparent); opacity:0; transition:0.3s; }
+  .module-preview:hover { border-color:rgba(0,194,212,0.4); transform:translateY(-3px); }
+  .module-preview:hover::before { opacity:1; }
+  .module-num { font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; color:var(--teal); opacity:0.5; }
+  .module-preview-title { font-size:0.78rem; color:var(--text-muted); margin-top:4px; line-height:1.4; }
+  .module-preview .status-dot { width:8px; height:8px; border-radius:50%; background:var(--card-border); margin:8px auto 0; }
+  .module-preview.done .status-dot { background:var(--green); box-shadow:0 0 6px var(--green); }
+
+  /* ── MAP SCREEN ── */
+  #screen-map { }
+  .map-title { font-family:'Syne',sans-serif; font-weight:800; font-size:1.8rem; margin-bottom:8px; }
+  .map-subtitle { color:var(--text-muted); margin-bottom:36px; }
+  .journey-map { display:flex; flex-direction:column; gap:16px; width:100%; max-width:680px; }
+  .level-card { background:var(--card-bg); border:1px solid var(--card-border); border-radius:18px; padding:20px 24px; cursor:pointer; transition:all 0.3s; display:flex; align-items:center; gap:20px; position:relative; overflow:hidden; }
+  .level-card::after { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--teal); transform:scaleY(0); transition:0.3s; border-radius:0 2px 2px 0; }
+  .level-card:hover { border-color:rgba(0,194,212,0.4); transform:translateX(4px); }
+  .level-card:hover::after { transform:scaleY(1); }
+  .level-card.locked { opacity:0.4; cursor:not-allowed; pointer-events:none; }
+  .level-card.completed { border-color:rgba(34,217,138,0.3); }
+  .level-card.completed::after { background:var(--green); transform:scaleY(1); }
+  .level-card.active-level { border-color:rgba(0,194,212,0.5); box-shadow:0 0 20px rgba(0,194,212,0.1); }
+  .level-icon { width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:1.6rem; flex-shrink:0; }
+  .level-info { flex:1; }
+  .level-title { font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; margin-bottom:4px; }
+  .level-desc { font-size:0.8rem; color:var(--text-muted); line-height:1.5; }
+  .level-right { display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
+  .level-xp { font-family:'Syne',sans-serif; font-weight:700; color:var(--gold); font-size:0.85rem; }
+  .lock-icon { font-size:1.2rem; color:var(--text-muted); }
+  .check-icon { font-size:1.2rem; color:var(--green); }
+
+  /* ── MODULE SCREEN ── */
+  #screen-module { max-width:800px; width:100%; }
+  .module-header { width:100%; margin-bottom:32px; }
+  .module-breadcrumb { font-size:0.8rem; color:var(--text-muted); margin-bottom:8px; cursor:pointer; }
+  .module-breadcrumb:hover { color:var(--teal); }
+  .module-tag { display:inline-block; background:rgba(132,94,247,0.2); border:1px solid rgba(132,94,247,0.4); border-radius:20px; padding:4px 14px; font-size:0.75rem; color:#a78bfa; margin-bottom:12px; }
+  .module-h1 { font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(1.6rem,3.5vw,2.2rem); line-height:1.2; margin-bottom:12px; }
+  .module-intro { color:var(--text-muted); font-size:0.95rem; line-height:1.7; }
+  
+  /* Content cards */
+  .content-section { width:100%; margin-bottom:28px; }
+  .content-card { background:var(--card-bg); border:1px solid var(--card-border); border-radius:16px; padding:24px; margin-bottom:16px; }
+  .content-card-title { font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; margin-bottom:12px; display:flex; align-items:center; gap:10px; }
+  .content-card-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1rem; }
+  .content-card p { font-size:0.9rem; color:var(--text-muted); line-height:1.7; }
+  
+  .pillars-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; width:100%; }
+  .pillar { background:var(--card-bg); border:1px solid var(--card-border); border-radius:16px; padding:20px; transition:all 0.3s; cursor:default; }
+  .pillar-icon { font-size:1.8rem; margin-bottom:10px; }
+  .pillar-title { font-family:'Syne',sans-serif; font-weight:700; font-size:0.9rem; margin-bottom:6px; }
+  .pillar-desc { font-size:0.8rem; color:var(--text-muted); line-height:1.5; }
+  
+  .dos-donts { display:grid; grid-template-columns:1fr 1fr; gap:16px; width:100%; }
+  @media(max-width:600px){ .dos-donts{grid-template-columns:1fr;} }
+  .do-col, .dont-col { background:var(--card-bg); border-radius:16px; padding:20px; }
+  .do-col { border:1px solid rgba(34,217,138,0.3); }
+  .dont-col { border:1px solid rgba(255,107,107,0.3); }
+  .col-title { font-family:'Syne',sans-serif; font-weight:700; font-size:0.95rem; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .col-item { font-size:0.82rem; color:var(--text-muted); margin-bottom:10px; padding-left:18px; position:relative; line-height:1.5; }
+  .col-item::before { content:''; position:absolute; left:0; top:7px; width:8px; height:8px; border-radius:50%; }
+  .do-col .col-item::before { background:var(--green); }
+  .dont-col .col-item::before { background:var(--coral); }
+
+  .red-flags-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; width:100%; }
+  .red-flag-card { background:rgba(255,107,107,0.05); border:1px solid rgba(255,107,107,0.2); border-radius:16px; padding:18px; }
+  .rf-num { font-family:'Syne',sans-serif; font-weight:800; font-size:1.5rem; color:rgba(255,107,107,0.4); margin-bottom:6px; }
+  .rf-title { font-family:'Syne',sans-serif; font-weight:700; font-size:0.88rem; color:var(--coral); margin-bottom:8px; }
+  .rf-desc { font-size:0.8rem; color:var(--text-muted); line-height:1.5; }
+  .rf-items { margin-top:8px; }
+  .rf-item { font-size:0.78rem; color:var(--text-muted); padding:3px 0; padding-left:14px; position:relative; }
+  .rf-item::before { content:'⚠'; position:absolute; left:0; font-size:0.65rem; }
+
+  .case-study { background:var(--card-bg); border:1px solid var(--card-border); border-radius:16px; padding:22px; margin-bottom:16px; }
+  .cs-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
+  .cs-label { font-family:'Syne',sans-serif; font-weight:800; font-size:0.8rem; background:rgba(255,107,107,0.2); color:var(--coral); padding:4px 12px; border-radius:20px; }
+  .violation-chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+  .chip { background:rgba(245,197,24,0.12); border:1px solid rgba(245,197,24,0.25); border-radius:20px; padding:4px 12px; font-size:0.75rem; color:var(--gold); }
+
+  .manager-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; width:100%; }
+  .mgr-card { background:var(--card-bg); border:1px solid var(--card-border); border-radius:16px; padding:20px; }
+  .mgr-icon { font-size:1.6rem; margin-bottom:10px; }
+  .mgr-title { font-family:'Syne',sans-serif; font-weight:700; font-size:0.88rem; margin-bottom:8px; }
+  .mgr-desc { font-size:0.8rem; color:var(--text-muted); line-height:1.5; }
+
+  /* ── QUIZ SECTION ── */
+  .quiz-section { width:100%; margin-top:8px; }
+  .quiz-zone { background:linear-gradient(135deg,rgba(132,94,247,0.1),rgba(0,194,212,0.05)); border:2px solid rgba(132,94,247,0.3); border-radius:20px; padding:28px; }
+  .quiz-header { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+  .quiz-badge { background:linear-gradient(135deg,var(--purple),#a78bfa); border-radius:10px; padding:6px 14px; font-family:'Syne',sans-serif; font-weight:700; font-size:0.75rem; color:#fff; }
+  .quiz-header-title { font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; }
+  .quiz-scenario { background:rgba(255,255,255,0.04); border-left:3px solid var(--purple); border-radius:0 10px 10px 0; padding:14px 18px; margin-bottom:20px; font-size:0.88rem; line-height:1.7; color:var(--text); }
+  .quiz-question { font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; margin-bottom:16px; }
+  .quiz-options { display:flex; flex-direction:column; gap:10px; }
+  .quiz-option { background:rgba(255,255,255,0.04); border:1.5px solid rgba(255,255,255,0.1); border-radius:12px; padding:14px 18px; cursor:pointer; transition:all 0.2s; font-size:0.88rem; display:flex; align-items:center; gap:12px; }
+  .quiz-option:hover:not(.disabled) { border-color:rgba(132,94,247,0.5); background:rgba(132,94,247,0.08); }
+  .quiz-option.correct { border-color:var(--green); background:rgba(34,217,138,0.1); color:var(--green); animation:correctPulse 0.4s ease; }
+  .quiz-option.wrong { border-color:var(--coral); background:rgba(255,107,107,0.1); color:var(--coral); animation:shake 0.4s ease; }
+  .quiz-option.disabled { pointer-events:none; opacity:0.5; }
+  .quiz-option.disabled.correct { opacity:1; }
+  @keyframes correctPulse { 0%{transform:scale(1)} 50%{transform:scale(1.02)} 100%{transform:scale(1)} }
+  @keyframes shake { 0%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)} 100%{transform:translateX(0)} }
+  .opt-letter { width:28px; height:28px; border-radius:8px; background:rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-weight:700; font-size:0.8rem; flex-shrink:0; }
+  .quiz-option.correct .opt-letter { background:rgba(34,217,138,0.2); color:var(--green); }
+  .quiz-option.wrong .opt-letter { background:rgba(255,107,107,0.2); color:var(--coral); }
+  .quiz-feedback { margin-top:16px; padding:14px 18px; border-radius:12px; font-size:0.88rem; line-height:1.6; display:none; }
+  .quiz-feedback.show { display:block; animation:fadeSlide 0.3s ease; }
+  .quiz-feedback.good { background:rgba(34,217,138,0.1); border:1px solid rgba(34,217,138,0.3); color:var(--green); }
+  .quiz-feedback.bad { background:rgba(255,107,107,0.1); border:1px solid rgba(255,107,107,0.3); color:var(--coral); }
+  .try-again-msg { font-weight:700; }
+
+  /* Sort game */
+  .sort-game { }
+  .sort-instructions { font-size:0.82rem; color:var(--text-muted); margin-bottom:16px; }
+  .sort-items { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
+  .sort-item { background:rgba(255,255,255,0.07); border:1.5px solid rgba(255,255,255,0.15); border-radius:10px; padding:10px 16px; font-size:0.82rem; cursor:pointer; transition:all 0.25s; user-select:none; }
+  .sort-item:hover { border-color:var(--teal); background:rgba(0,194,212,0.08); }
+  .sort-item.selected { border-color:var(--purple); background:rgba(132,94,247,0.15); }
+  .sort-item.placed { opacity:0.35; pointer-events:none; }
+  .sort-buckets { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .sort-bucket { border-radius:14px; padding:16px; min-height:100px; transition:all 0.3s; }
+  .bucket-do { background:rgba(34,217,138,0.06); border:2px dashed rgba(34,217,138,0.3); }
+  .bucket-dont { background:rgba(255,107,107,0.06); border:2px dashed rgba(255,107,107,0.3); }
+  .bucket-do.highlight { background:rgba(34,217,138,0.12); border-color:rgba(34,217,138,0.6); }
+  .bucket-dont.highlight { background:rgba(255,107,107,0.12); border-color:rgba(255,107,107,0.6); }
+  .bucket-title { font-family:'Syne',sans-serif; font-weight:700; font-size:0.85rem; margin-bottom:10px; }
+  .bucket-do .bucket-title { color:var(--green); }
+  .bucket-dont .bucket-title { color:var(--coral); }
+  .bucket-items { display:flex; flex-wrap:wrap; gap:8px; min-height:40px; }
+  .bucket-chip { background:rgba(255,255,255,0.08); border-radius:8px; padding:6px 12px; font-size:0.78rem; display:flex; align-items:center; gap:6px; }
+  .bucket-chip .remove-chip { cursor:pointer; opacity:0.6; font-size:0.7rem; }
+  .bucket-chip .remove-chip:hover { opacity:1; }
+  .sort-check-btn { margin-top:16px; background:linear-gradient(135deg,var(--purple),#a78bfa); border:none; border-radius:10px; padding:12px 28px; color:#fff; font-family:'Syne',sans-serif; font-weight:700; font-size:0.88rem; cursor:pointer; transition:all 0.3s; }
+  .sort-check-btn:hover { transform:translateY(-2px); box-shadow:0 0 20px rgba(132,94,247,0.4); }
+  .sort-check-btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; box-shadow:none; }
+
+  /* Spot the violation game */
+  .spot-list { display:flex; flex-direction:column; gap:10px; margin-bottom:16px; }
+  .spot-item { background:rgba(255,255,255,0.04); border:1.5px solid rgba(255,255,255,0.1); border-radius:12px; padding:14px 18px; cursor:pointer; transition:all 0.2s; font-size:0.85rem; display:flex; align-items:center; gap:12px; }
+  .spot-item:hover:not(.disabled) { border-color:rgba(245,197,24,0.4); background:rgba(245,197,24,0.05); }
+  .spot-item.flagged-right { border-color:var(--green); background:rgba(34,217,138,0.08); }
+  .spot-item.flagged-wrong { border-color:var(--coral); background:rgba(255,107,107,0.08); animation:shake 0.4s ease; }
+  .spot-item.missed { border-color:rgba(245,197,24,0.4); background:rgba(245,197,24,0.05); }
+  .spot-icon { font-size:1.2rem; flex-shrink:0; }
+
+  /* Rapid Fire */
+  .rapid-fire { }
+  .rf-progress { display:flex; gap:6px; margin-bottom:20px; }
+  .rf-dot { width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.15); transition:all 0.3s; }
+  .rf-dot.done-right { background:var(--green); }
+  .rf-dot.done-wrong { background:var(--coral); }
+  .rf-dot.current { background:var(--gold); box-shadow:0 0 8px var(--gold); }
+  .tf-options { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .tf-btn { border:2px solid rgba(255,255,255,0.1); border-radius:14px; padding:18px; text-align:center; cursor:pointer; transition:all 0.25s; font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; background:transparent; color:var(--text); }
+  .tf-btn:hover:not(.disabled) { transform:scale(1.03); }
+  .tf-btn.true-btn:hover:not(.disabled) { border-color:var(--green); color:var(--green); background:rgba(34,217,138,0.08); }
+  .tf-btn.false-btn:hover:not(.disabled) { border-color:var(--coral); color:var(--coral); background:rgba(255,107,107,0.08); }
+  .tf-btn.correct { border-color:var(--green); color:var(--green); background:rgba(34,217,138,0.12); }
+  .tf-btn.wrong { border-color:var(--coral); color:var(--coral); background:rgba(255,107,107,0.12); animation:shake 0.4s ease; }
+
+  /* Investigation board */
+  .inv-board { }
+  .inv-intro { font-size:0.85rem; color:var(--text-muted); margin-bottom:16px; }
+  .inv-items { display:flex; flex-direction:column; gap:10px; }
+  .inv-item { background:rgba(255,255,255,0.04); border:1.5px solid rgba(255,255,255,0.1); border-radius:12px; padding:14px 18px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+  .inv-item-desc { font-size:0.85rem; flex:1; }
+  .inv-item-select { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:6px 10px; color:var(--text); font-family:'Plus Jakarta Sans',sans-serif; font-size:0.8rem; cursor:pointer; outline:none; }
+  .inv-item.correct-row { border-color:var(--green); background:rgba(34,217,138,0.06); }
+  .inv-item.wrong-row { border-color:var(--coral); background:rgba(255,107,107,0.06); animation:shake 0.4s ease; }
+  .inv-check-btn { margin-top:16px; background:linear-gradient(135deg,var(--gold),#fbbf24); border:none; border-radius:10px; padding:12px 28px; color:#0b1437; font-family:'Syne',sans-serif; font-weight:700; font-size:0.88rem; cursor:pointer; transition:all 0.3s; }
+  .inv-check-btn:hover { transform:translateY(-2px); box-shadow:0 0 20px rgba(245,197,24,0.4); }
+
+  /* ── COMPLETION SCREEN ── */
+  .completion-zone { text-align:center; padding:28px; background:linear-gradient(135deg,rgba(34,217,138,0.1),rgba(0,194,212,0.05)); border:2px solid rgba(34,217,138,0.3); border-radius:20px; width:100%; }
+  .completion-emoji { font-size:3rem; margin-bottom:12px; animation:bounce 0.6s infinite alternate; }
+  @keyframes bounce { from{transform:translateY(0)} to{transform:translateY(-8px)} }
+  .completion-title { font-family:'Syne',sans-serif; font-weight:800; font-size:1.4rem; color:var(--green); margin-bottom:8px; }
+  .completion-text { font-size:0.88rem; color:var(--text-muted); margin-bottom:16px; }
+  .xp-earned { display:inline-block; background:rgba(245,197,24,0.15); border:1px solid rgba(245,197,24,0.3); border-radius:20px; padding:8px 20px; font-family:'Syne',sans-serif; font-weight:700; color:var(--gold); font-size:0.95rem; margin-bottom:20px; }
+
+  /* ── CONTINUE BTN ── */
+  .btn-continue { background:linear-gradient(135deg,var(--teal),var(--teal2)); border:none; border-radius:12px; padding:14px 36px; color:#0b1437; font-family:'Syne',sans-serif; font-weight:700; font-size:0.95rem; cursor:pointer; transition:all 0.3s; margin-top:20px; box-shadow:0 0 20px rgba(0,194,212,0.2); }
+  .btn-continue:hover { transform:translateY(-2px); box-shadow:0 0 30px rgba(0,194,212,0.4); }
+  .btn-continue:disabled { opacity:0.3; cursor:not-allowed; transform:none; box-shadow:none; }
+
+  /* ── FINAL SCREEN ── */
+  #screen-complete { justify-content:center; text-align:center; }
+  .final-badge { font-size:5rem; margin-bottom:16px; animation:spin-badge 1s ease; }
+  @keyframes spin-badge { from{transform:rotate(-180deg) scale(0)} to{transform:rotate(0) scale(1)} }
+  .final-title { font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(1.8rem,4vw,2.8rem); margin-bottom:12px; }
+  .final-title span { background:linear-gradient(135deg,var(--gold),var(--teal)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .final-stats { display:flex; justify-content:center; gap:24px; flex-wrap:wrap; margin:24px 0; }
+  .final-stat { text-align:center; }
+  .final-stat-num { font-family:'Syne',sans-serif; font-weight:800; font-size:2rem; color:var(--gold); }
+  .final-stat-label { font-size:0.8rem; color:var(--text-muted); }
+  .badges-earned { display:flex; justify-content:center; gap:14px; flex-wrap:wrap; margin:20px 0; }
+  .badge-chip { background:rgba(132,94,247,0.15); border:1px solid rgba(132,94,247,0.3); border-radius:12px; padding:10px 18px; font-size:0.82rem; display:flex; align-items:center; gap:8px; }
+  .btn-restart { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:12px 28px; color:var(--text); font-family:'Syne',sans-serif; font-weight:600; font-size:0.9rem; cursor:pointer; transition:all 0.3s; margin-top:16px; }
+  .btn-restart:hover { border-color:rgba(0,194,212,0.4); color:var(--teal); }
+
+  /* confetti */
+  .confetti { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:999; }
+  .conf-piece { position:absolute; width:8px; height:8px; opacity:0; border-radius:2px; animation: confettiFall var(--dur,2s) var(--del,0s) ease-in forwards; }
+  @keyframes confettiFall {
+    0% { transform:translateY(-20px) rotate(0deg); opacity:1; left:var(--x); }
+    100% { transform:translateY(100vh) rotate(720deg); opacity:0; left:calc(var(--x) + var(--drift,20px)); }
+  }
+
+  /* Responsive */
+  @media(max-width:600px){ .sort-buckets{grid-template-columns:1fr;} .tf-options{grid-template-columns:1fr;} }
+
+  .divider { width:100%; height:1px; background:var(--card-border); margin:28px 0; }
+  
+  .alert-note { background:rgba(245,197,24,0.08); border:1px solid rgba(245,197,24,0.25); border-radius:12px; padding:14px 18px; font-size:0.82rem; color:var(--gold); display:flex; gap:10px; align-items:flex-start; margin-bottom:20px; }
+</style>
+<!-- Firebase v9 compat SDK (works in plain HTML, no bundler needed) -->
+</head>
+<body>
+
+<div class="bg-stars"></div>
+
+<!-- Stars -->
+<script>
+
+(()=>{for(let i=0;i<60;i++){let s=document.createElement('div');s.className='star';let sz=Math.random()*2+1;s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*4}s;--o:${0.3+Math.random()*0.5};animation-delay:${Math.random()*4}s`;document.body.appendChild(s);}})();
+</script>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <div class="nav-logo">⚖ Ethics Quest</div>
+  <div class="nav-right">
+    <div class="xp-badge"><span class="xp-icon">⚡</span><span class="xp-val" id="nav-xp">0 XP</span></div>
+    <div class="progress-pill">
+      <span id="nav-progress-text">0/7</span>
+      <div class="mini-progress"><div class="mini-progress-fill" id="mini-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+</nav>
+
+<div class="app">
+
+<!-- ══════════════ WELCOME SCREEN ══════════════ -->
+<section class="screen active" id="screen-welcome">
+  <div class="hero-badge">🎓 Compliance Training</div>
+  <h1 class="hero-title">Master <span>Ethical</span><br>Expense Claims</h1>
+  <p class="hero-sub">An interactive quest through 7 modules. Learn, play, and earn badges while mastering the art of honest expense reporting.</p>
+  <div class="name-input-wrap">
+    <input class="name-input" id="learner-name" type="text" placeholder="Enter your name to begin..." maxlength="40">
+    <button class="btn-start" onclick="startLearning()">Start Quest →</button>
+  </div>
+  <div class="module-grid" id="welcome-grid"></div>
+</section>
+
+<!-- ══════════════ MAP SCREEN ══════════════ -->
+<section class="screen" id="screen-map">
+  <div style="width:100%;max-width:680px">
+    <div class="module-breadcrumb" onclick="backToWelcome()">← Back to Home</div>
+    <h2 class="map-title">🗺 Your Learning Journey</h2>
+    <p class="map-subtitle">Complete each module in order. Earn XP and unlock badges!</p>
+    <div class="journey-map" id="journey-map"></div>
+  </div>
+</section>
+
+<!-- ══════════════ MODULE SCREEN ══════════════ -->
+<section class="screen" id="screen-module">
+  <div class="module-header">
+    <div class="module-breadcrumb" onclick="showMap()">← Back to Map</div>
+    <div class="module-tag" id="mod-tag"></div>
+    <h1 class="module-h1" id="mod-title"></h1>
+    <p class="module-intro" id="mod-intro"></p>
+  </div>
+  <div id="mod-content" style="width:100%"></div>
+  <div class="divider"></div>
+  <div class="quiz-section" id="quiz-container"></div>
+  <div class="completion-zone" id="completion-zone" style="display:none;margin-top:24px">
+    <div class="completion-emoji" id="completion-emoji">🎉</div>
+    <div class="completion-title" id="completion-title">Module Complete!</div>
+    <div class="completion-text" id="completion-text">You nailed it!</div>
+    <div class="xp-earned" id="xp-earned">+100 XP Earned</div>
+    <button class="btn-continue" onclick="nextModule()">Continue to Next Module →</button>
+  </div>
+</section>
+
+<!-- ══════════════ FINAL SCREEN ══════════════ -->
+<section class="screen" id="screen-complete">
+  <div class="final-badge">🏆</div>
+  <h1 class="final-title">Congratulations,<br><span id="final-name">Champion</span>!</h1>
+  <p style="color:var(--text-muted);max-width:420px;margin:0 auto;">You've completed the Ethics Quest and earned your Integrity Champion badge. You are now equipped to uphold the highest standards of expense integrity.</p>
+  <div class="final-stats">
+    <div class="final-stat"><div class="final-stat-num" id="final-xp">0</div><div class="final-stat-label">XP Earned</div></div>
+    <div class="final-stat"><div class="final-stat-num" id="final-modules">7</div><div class="final-stat-label">Modules Done</div></div>
+    <div class="final-stat"><div class="final-stat-num" id="final-score">0%</div><div class="final-stat-label">Avg. Score</div></div>
+  </div>
+  <div class="badges-earned" id="badges-container"></div>
+  <button class="btn-continue" onclick="showMap()">Review Modules</button>
+  <button class="btn-restart" onclick="restartAll()">↺ Start Again</button>
+</section>
+
+</div><!-- /app -->
+
+<div class="confetti" id="confetti-container"></div>
+
+<script>
+// ══════════════════════════════════════════════
+//  GOOGLE SHEETS CONFIG
+//  Paste your Apps Script URL below (Step 2 of setup guide)
+// ══════════════════════════════════════════════
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNZ791Xkofb2OgML1Ipn2I5t7qVQWzKwszrzNfClhkuhaTVwBAsqbY_9_0NQXSYSbWKw/exec';
+
+// ── State ───────────────────────────────────────
+function genId(){ return 'L_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
+
+let activeId = null;
+let state = {
+  learnerId: null, learnerName: '', startTime: null, lastActive: null,
+  xp: 0, modules: {}, quizAttempts: [], currentModule: 0, totalWrongAttempts: 0
+};
+
+// ── Restore session (survives page refresh) ──────
+function loadState(){
+  try {
+    const saved = sessionStorage.getItem('eq_session');
+    if(saved){ const d = JSON.parse(saved); activeId = d.learnerId; Object.assign(state, d); }
+  } catch(e){}
+}
+
+// ── Save to Google Sheet ─────────────────────────
+let saveTimer = null;
+function saveState(){
+  if(!activeId) return;
+  state.lastActive = new Date().toISOString();
+  // Instant local backup (survives refresh)
+  try{ sessionStorage.setItem('eq_session', JSON.stringify(state)); }catch(e){}
+  // Debounce sheet writes — max once per 3 seconds
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    if(APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbzNZ791Xkofb2OgML1Ipn2I5t7qVQWzKwszrzNfClhkuhaTVwBAsqbY_9_0NQXSYSbWKw/exec') return;
+    const payload = {
+      learnerId: activeId,
+      learnerName: state.learnerName,
+      startTime: state.startTime,
+      lastActive: state.lastActive,
+      xp: state.xp,
+      modules: state.modules,
+      quizAttempts: state.quizAttempts,
+      currentModule: state.currentModule,
+      totalWrongAttempts: state.totalWrongAttempts
+    };
+    // Use text/plain to avoid CORS preflight — Apps Script handles both
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    }).catch(() => {}); // silent fail — session storage keeps data safe
+  }, 3000);
+}
+
+loadState();
+
+// ══════════════════════════════════════════════
+//  MODULE DEFINITIONS
+// ══════════════════════════════════════════════
+const MODULES = [
+  {
+    id:'m1', xp:100, emoji:'🎯', tag:'Module 1', 
+    bgColor:'rgba(0,194,212,0.15)',
+    title:'Objective & Foundation',
+    intro:'Before we begin claiming expenses, let\'s understand the core mission: building a culture where every rupee claimed is earned with integrity and backed by truth.',
+    badge:'Foundation Badge 🎯',
+    renderContent: ()=>`
+      <div class="content-card">
+        <div class="content-card-title"><div class="content-card-icon" style="background:rgba(0,194,212,0.15);font-size:1.1rem">🎯</div>The Core Objective</div>
+        <p>To foster a culture of <strong>integrity and accountability</strong> by ensuring all employees understand and adhere to the ethical standards and company policies for expense reimbursement.</p>
+      </div>
+      <div class="alert-note">⚠️ <span><strong>Important Warning:</strong> Any violation will invite strict disciplinary measures. This is not just policy — it is a matter of personal integrity and professional trust.</span></div>
+      <div class="content-card">
+        <div class="content-card-title"><div class="content-card-icon" style="background:rgba(245,197,24,0.15)">💡</div>Why Does This Matter?</div>
+        <p>Expense fraud costs organizations billions globally each year. Beyond financial loss, it erodes team trust, damages careers, and creates a toxic culture. Being part of the solution means being honest — every single time.</p>
+      </div>`,
+    quiz: {
+      type: 'mcq',
+      scenario: '🏢 Scenario: Rahul just got back from a 3-day business trip. He wants to claim all his expenses but isn\'t sure what\'s allowed. He asks his colleague for advice.',
+      question: 'Which response best captures the core objective of the company\'s expense policy?',
+      options: [
+        { letter:'A', text:'Claim everything — the company is big enough to absorb small errors.', correct:false, feedback:'❌ This attitude directly opposes the policy. Every claim must be legitimate and honest, regardless of company size.' },
+        { letter:'B', text:'Only claim genuine business expenses backed by authentic receipts, with accurate details.', correct:true, feedback:'✅ Exactly right! The policy is rooted in honesty, accuracy, and legitimacy. This protects both the employee and the company.' },
+        { letter:'C', text:'The goal is to follow rules only when auditors are watching.', correct:false, feedback:'❌ Integrity means doing the right thing always — not just when being observed. This is not the company\'s expectation.' },
+        { letter:'D', text:'Expense policies are guidelines, not requirements.', correct:false, feedback:'❌ Expense policies are mandatory. Violations result in disciplinary action.' }
+      ]
+    }
+  },
+  {
+    id:'m2', xp:120, emoji:'🧭', tag:'Module 2',
+    bgColor:'rgba(132,94,247,0.15)',
+    title:'Core Ethics of Expense Claims',
+    intro:'Four pillars form the ethical foundation of every expense claim. Understanding these will guide every decision you make when submitting expenses.',
+    badge:'Ethics Pillar Badge 🧭',
+    renderContent: ()=>`
+      <div class="pillars-grid">
+        <div class="pillar">
+          <div class="pillar-icon">🤝</div>
+          <div class="pillar-title">Honesty & Integrity</div>
+          <div class="pillar-desc">All claims must be a truthful and accurate representation of expenses incurred for business purposes. No inflation, no fabrication.</div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-icon">✅</div>
+          <div class="pillar-title">Legitimacy & Business Purpose</div>
+          <div class="pillar-desc">Only expenses directly related to your work that benefit the company are eligible. Personal expenses are never reimbursable.</div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-icon">📋</div>
+          <div class="pillar-title">Accuracy & Detail</div>
+          <div class="pillar-desc">Claims must be precise — correct figures, dates, clear descriptions, and proper original documentation. No blurry scans or altered receipts.</div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-icon">📜</div>
+          <div class="pillar-title">Compliance with Policy</div>
+          <div class="pillar-desc">You are responsible for knowing and following the company's specific expense policies. Ignorance is not an excuse for violations.</div>
+        </div>
+      </div>`,
+    quiz: {
+      type:'mcq',
+      scenario:'📋 Scenario: Priya submitted a fuel claim for ₹2,000 but her actual fuel cost was ₹1,200. She inflated the amount thinking "it won\'t be noticed" and submitted a slightly modified receipt.',
+      question:'Which of the four core ethics pillars did Priya violate MOST directly?',
+      options:[
+        { letter:'A', text:'Legitimacy & Business Purpose — the trip wasn\'t for business.', correct:false, feedback:'❌ The trip could have been for business. The key issue here isn\'t legitimacy of purpose, but what she did with the receipt.' },
+        { letter:'B', text:'Honesty & Integrity + Accuracy & Detail — she falsified the receipt and inflated the amount.', correct:true, feedback:'✅ Correct! Priya violated both Honesty & Integrity (by lying about the amount) and Accuracy & Detail (by altering the receipt). Both violations could lead to serious consequences.' },
+        { letter:'C', text:'Compliance with Policy — she didn\'t know the fuel limit.', correct:false, feedback:'❌ Policy limits might be relevant, but altering a receipt goes far beyond a policy misunderstanding — it\'s deliberate fraud.' },
+        { letter:'D', text:'No violation occurred — minor inflation is normal.', correct:false, feedback:'❌ There is no "normal" inflation. Any misrepresentation of an expense is a serious violation.' }
+      ]
+    }
+  },
+  {
+    id:'m3', xp:150, emoji:'⚖️', tag:'Module 3',
+    bgColor:'rgba(34,217,138,0.1)',
+    title:"Key Do's and Don'ts",
+    intro:"Let's put your knowledge into practice. Understanding what you SHOULD and SHOULD NOT do is critical to staying compliant.",
+    badge:"Policy Pro Badge ⚖️",
+    renderContent: ()=>`
+      <div class="dos-donts">
+        <div class="do-col">
+          <div class="col-title">✅ DO</div>
+          <div class="col-item">Submit claims for genuine business expenses supported by authentic receipts</div>
+          <div class="col-item">Claim for legitimate business lunch with a vendor/customer to discuss business</div>
+          <div class="col-item">State the exact cost, date, and purpose with a clear, original receipt</div>
+          <div class="col-item">Seek clarification from managers or BizFin when unsure</div>
+        </div>
+        <div class="dont-col">
+          <div class="col-title">❌ DON'T</div>
+          <div class="col-item">Misrepresent an expense or claim personal day as business travel</div>
+          <div class="col-item">Submit fraudulent receipts for personal meals with friends</div>
+          <div class="col-item">Claim personal expenses: fuel, souvenirs, home bills, vehicle maintenance</div>
+          <div class="col-item">Split claims to hide policy limit breaches or submit blurry scans</div>
+        </div>
+      </div>`,
+    quiz:{
+      type:'sort',
+      instruction:'🎮 Sort Game: Click each item, then click the correct bucket (✅ DO or ❌ DON\'T). Get them all right to proceed!',
+      items:[
+        { id:'s1', text:'Claim fuel for your personal car weekend trip', category:'dont' },
+        { id:'s2', text:'Attach original receipt with exact date and amount', category:'do' },
+        { id:'s3', text:'Submit a lunch claim with a client discussing business', category:'do' },
+        { id:'s4', text:'Split a ₹5000 claim into two ₹2500 claims to hide it', category:'dont' },
+        { id:'s5', text:'Submit home electricity bill as a business expense', category:'dont' },
+        { id:'s6', text:'Ask your manager before claiming an unusual expense', category:'do' }
+      ]
+    }
+  },
+  {
+    id:'m4', xp:130, emoji:'🚩', tag:'Module 4',
+    bgColor:'rgba(255,107,107,0.1)',
+    title:'Red Flags: Prohibited Practices',
+    intro:'Certain behaviours are absolute violations. Learn to recognise these red flags — not just to avoid them, but to understand why they are considered fraud.',
+    badge:'Red Flag Detector 🚩',
+    renderContent: ()=>`
+      <div class="red-flags-grid">
+        <div class="red-flag-card">
+          <div class="rf-num">01</div>
+          <div class="rf-title">Fabricated or Altered Bills</div>
+          <div class="rf-desc">Never create, edit, inflate, or falsify any part of a bill or receipt. This is intentional fraud.</div>
+        </div>
+        <div class="red-flag-card">
+          <div class="rf-num">02</div>
+          <div class="rf-title">Personal Expense Claims</div>
+          <div class="rf-desc">The following are strictly prohibited:</div>
+          <div class="rf-items">
+            <div class="rf-item">Fuel for personal travel or car maintenance</div>
+            <div class="rf-item">Personal medical bills or home utility bills</div>
+            <div class="rf-item">Expenses for friends and family</div>
+          </div>
+        </div>
+        <div class="red-flag-card">
+          <div class="rf-num">03</div>
+          <div class="rf-title">Duplicate Claims</div>
+          <div class="rf-desc">Submitting the same bill more than once — whether by yourself or coordinated with a colleague — is strictly forbidden.</div>
+        </div>
+        <div class="red-flag-card">
+          <div class="rf-num">04</div>
+          <div class="rf-title">Claims on Behalf of Others</div>
+          <div class="rf-desc">Each person must submit their own expenses only. Claiming for others — especially separated employees — has resulted in real disciplinary cases.</div>
+        </div>
+      </div>`,
+    quiz:{
+      type:'spot',
+      intro:'🔎 Detective Mode: Review these expense claims. Click on ALL items that are RED FLAGS (violations). Then submit your findings!',
+      items:[
+        { id:'v1', text:'₹1,200 fuel claim for a client visit on Monday, with original petrol receipt attached', violation:false },
+        { id:'v2', text:'₹800 home electricity bill submitted as "work from home expenses"', violation:true },
+        { id:'v3', text:'₹3,500 team lunch with manager approval and itemized receipt', violation:false },
+        { id:'v4', text:'Same ₹2,000 hotel receipt submitted twice in the same month', violation:true },
+        { id:'v5', text:'₹500 expense claim filed on behalf of a colleague who resigned last month', violation:true },
+        { id:'v6', text:'₹650 auto fare to client office with valid receipt and purpose noted', violation:false },
+        { id:'v7', text:'Receipt shows ₹900 but claim submitted for ₹1,400 with the same receipt', violation:true }
+      ],
+      submitLabel:'🔍 Submit Findings'
+    }
+  },
+  {
+    id:'m5', xp:140, emoji:'⛽', tag:'Module 5',
+    bgColor:'rgba(245,197,24,0.08)',
+    title:'Red Flags: Fuel Claim Violations',
+    intro:'Fuel claims have been one of the most abused expense categories. Real investigations have uncovered impossible travel scenarios — let\'s test your detection skills.',
+    badge:'Fuel Watchdog Badge ⛽',
+    renderContent: ()=>`
+      <div class="content-card">
+        <div class="content-card-title"><div class="content-card-icon" style="background:rgba(245,197,24,0.15)">⛽</div>What Makes a Valid Fuel Claim?</div>
+        <p>Fuel claims must be for <strong>legitimate business travel only</strong>. The company has identified patterns of abuse including:</p>
+      </div>
+      <div class="red-flags-grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+        <div class="red-flag-card">
+          <div class="rf-title">🚗 Claiming for Friends' Vehicles</div>
+          <div class="rf-desc">Fuel purchased for a personal vehicle belonging to a friend or family member and submitted as a business claim.</div>
+        </div>
+        <div class="red-flag-card">
+          <div class="rf-title">⛽ Mixed Fuel Types Same Day</div>
+          <div class="rf-desc">Claiming both petrol AND diesel fuel fills on the same day is a physical impossibility for a single vehicle.</div>
+        </div>
+        <div class="red-flag-card">
+          <div class="rf-title">📍 Impossible Distances</div>
+          <div class="rf-desc">Real case: fuel claimed from two locations 500km apart within 2–3 hours. Physically impossible, clearly fraudulent.</div>
+        </div>
+      </div>`,
+    quiz:{
+      type:'rapidfire',
+      questions:[
+        { q:'An employee fills petrol at 9am in Mumbai and claims diesel fill at 11am in Mumbai same day. Is this a violation?', answer:true, explain:'TRUE — A single vehicle cannot use both petrol and diesel. This is a clear red flag of fabricated fuel claims.' },
+        { q:'An employee claims fuel for a client visit 80km away, submitting one receipt with the correct pump location. This is acceptable.', answer:true, explain:'TRUE — Single receipt for a legitimate client visit with correct location is valid.' },
+        { q:'Two fuel receipts are submitted for the same day from locations 450km apart, both within 3 hours of each other. This is physically possible.', answer:false, explain:'FALSE — Travelling 450km in 3 hours is physically impossible under normal circumstances. This is a fraudulent claim.' },
+        { q:'Claiming fuel for your friend\'s car that you borrowed for a business trip is always acceptable.', answer:false, explain:'FALSE — Fuel claims must be for the employee\'s own business travel vehicle. Claiming for a friend\'s car is prohibited.' },
+        { q:'Submitting fuel receipts from 95 different instances totalling ₹1.7 Lakhs without proper business justification is a red flag.', answer:true, explain:'TRUE — High-volume fuel claims without justification are a serious red flag. In a real case, this resulted in disciplinary action.' }
+      ]
+    }
+  },
+  {
+    id:'m6', xp:160, emoji:'🔬', tag:'Module 6',
+    bgColor:'rgba(255,165,0,0.08)',
+    title:'Case Studies: Learning from Real Violations',
+    intro:'These are real anonymised cases from within our organisation. Understanding what happened — and the consequences — is the most powerful learning tool.',
+    badge:'Case Analyst Badge 🔬',
+    renderContent: ()=>`
+      <div class="case-study">
+        <div class="cs-header">
+          <div><strong style="font-family:'Syne',sans-serif">Instance 1</strong></div>
+          <div class="cs-label">HIGH SEVERITY</div>
+        </div>
+        <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.7">This individual intentionally submitted <strong>inflated and fabricated bills</strong> (2 instances, ₹17K), claimed for a <strong>separated employee</strong> (1 instance, ₹921), filed a <strong>duplicate claim for bike rental</strong> (1 instance, ₹7.5K). Most critically: <strong>95 instances of improper fuel claims</strong> totalling ₹1.7 Lacs, and <strong>10 duplicate claims</strong> worth ₹43K.</p>
+        <div class="violation-chips">
+          <span class="chip">Fabricated Bills — ₹17K</span>
+          <span class="chip">Separated Employee Claim — ₹921</span>
+          <span class="chip">Duplicate Bike Rental — ₹7.5K</span>
+          <span class="chip">95× Improper Fuel — ₹1.7 Lacs</span>
+          <span class="chip">10× Duplicate Claims — ₹43K</span>
+        </div>
+      </div>
+      <div class="case-study">
+        <div class="cs-header">
+          <div><strong style="font-family:'Syne',sans-serif">Instance 2</strong></div>
+          <div class="cs-label">HIGH SEVERITY</div>
+        </div>
+        <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.7">This individual submitted <strong>fabricated bills</strong> (5 instances, ₹15K), claimed <strong>personal expenses</strong> including home electricity, personal vacation lodging, fuel for friends (4 instances, ₹10.7K), claimed for a <strong>separated employee</strong> (1 instance, ₹1K), had <strong>25 improper fuel claims</strong> (₹53K), and <strong>8 duplicate claims</strong> (₹15K).</p>
+        <div class="violation-chips">
+          <span class="chip">Fabricated Bills — ₹15K</span>
+          <span class="chip">Personal Expenses — ₹10.7K</span>
+          <span class="chip">Separated Employee — ₹1K</span>
+          <span class="chip">25× Improper Fuel — ₹53K</span>
+          <span class="chip">8× Duplicates — ₹15K</span>
+        </div>
+      </div>`,
+    quiz:{
+      type:'investigation',
+      intro:'🕵️ Investigation Board: Match each violation type to the correct consequence/category.',
+      items:[
+        { id:'i1', desc:'Submitting the same hotel bill twice in one month', answer:'duplicate', options:[{v:'duplicate',l:'Duplicate Claim'},{v:'personal',l:'Personal Expense'},{v:'fabricated',l:'Fabricated Bill'}] },
+        { id:'i2', desc:"Claiming friend's family vacation lodging as 'client accommodation'", answer:'personal', options:[{v:'duplicate',l:'Duplicate Claim'},{v:'personal',l:'Personal Expense'},{v:'fabricated',l:'Fabricated Bill'}] },
+        { id:'i3', desc:"Editing receipt from ₹500 to ₹1,500 and submitting it", answer:'fabricated', options:[{v:'duplicate',l:'Duplicate Claim'},{v:'personal',l:'Personal Expense'},{v:'fabricated',l:'Fabricated Bill'}] },
+        { id:'i4', desc:"Filing a claim for a colleague who left the company 2 months ago", answer:'others', options:[{v:'others',l:"Claim for Others"},{v:'personal',l:'Personal Expense'},{v:'duplicate',l:'Duplicate Claim'}] }
+      ]
+    }
+  },
+  {
+    id:'m7', xp:120, emoji:'👔', tag:'Module 7',
+    bgColor:'rgba(0,200,150,0.08)',
+    title:"Manager's Role & Seeking Guidance",
+    intro:'Managers are the first line of defense. And every employee has a responsibility to ask before acting when in doubt. Let\'s see what that looks like in practice.',
+    badge:'Integrity Champion 🏆',
+    renderContent: ()=>`
+      <div style="margin-bottom:20px">
+        <div class="content-card" style="margin-bottom:14px">
+          <div class="content-card-title"><div class="content-card-icon" style="background:rgba(0,200,150,0.15)">🙋</div>For Employees — When in Doubt</div>
+          <p>If you are ever unsure about whether an expense is claimable, it is your responsibility to seek clarification <em>before</em> submitting. Reach out to your <strong>Manager</strong>, <strong>BizFin (expense team)</strong>, or <strong>HRBP</strong>.</p>
+        </div>
+      </div>
+      <div class="manager-grid">
+        <div class="mgr-card">
+          <div class="mgr-icon">👁️</div>
+          <div class="mgr-title">Vigilance is Key</div>
+          <div class="mgr-desc">Managers are the first line of defense. Cross-check the objective and intent of every expense claim submitted by your team.</div>
+        </div>
+        <div class="mgr-card">
+          <div class="mgr-icon">❓</div>
+          <div class="mgr-title">Query and Clarify</div>
+          <div class="mgr-desc">If you have any doubt about a claim's legitimacy, raise a query with the employee to seek clarification before approving.</div>
+        </div>
+        <div class="mgr-card">
+          <div class="mgr-icon">🤝</div>
+          <div class="mgr-title">Seek Expert Advice</div>
+          <div class="mgr-desc">For policy ambiguity, managers should reach out to BizFin, HR, or the Risk teams for guidance. Never approve in doubt.</div>
+        </div>
+      </div>`,
+    quiz:{
+      type:'mcq',
+      scenario:"👔 Scenario: Arjun is a manager. His team member Sneha submits a ₹4,500 fuel claim. Arjun notices the dates and distances seem unusual — two receipts are from cities that are 300km apart on the same day. Arjun is unsure but doesn't want to embarrass Sneha.",
+      question:"What should Arjun do according to the company's policy on manager responsibilities?",
+      options:[
+        { letter:'A', text:'Approve it — employees should be trusted and questioning them damages morale.', correct:false, feedback:'❌ Trust is important, but vigilance is a manager\'s responsibility. Approving suspicious claims without investigation makes managers accountable too.' },
+        { letter:'B', text:'Quietly reject it without telling Sneha why.', correct:false, feedback:'❌ Silent rejection without clarification doesn\'t fulfil the manager\'s duty to query and clarify. Sneha needs to understand the issue.' },
+        { letter:'C', text:'Raise a query with Sneha for clarification, and if unsure, consult BizFin or the Risk team before approving.', correct:true, feedback:'✅ Perfect! Managers must query suspicious claims and consult experts when needed. Arjun should ask Sneha for an explanation and escalate to BizFin if the answer is unsatisfactory.' },
+        { letter:'D', text:'Report it immediately to HR without giving Sneha a chance to explain.', correct:false, feedback:'❌ The first step is to query the employee for clarification. Jumping straight to HR without querying is premature and bypasses the clarification process.' }
+      ]
+    }
+  }
+];
+
+// ══════════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════════
+let quizPassed = false;
+let moduleStartTime = null;
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function backToWelcome(){ 
+  renderWelcomeGrid();
+  showScreen('welcome'); 
+}
+function showMap(){ renderMap(); showScreen('map'); }
+
+function startLearning(){
+  const name = document.getElementById('learner-name').value.trim();
+  if(!name){ 
+    document.getElementById('learner-name').style.borderColor='var(--coral)'; 
+    document.getElementById('learner-name').placeholder='Please enter your name!';
+    return; 
+  }
+  // Always create a fresh learner entry — every Start Quest = one unique record
+  activeId = genId();
+  state = {
+    learnerId: activeId, learnerName: name,
+    startTime: new Date().toISOString(), lastActive: new Date().toISOString(),
+    xp: 0, modules: {}, quizAttempts: [], currentModule: 0, totalWrongAttempts: 0
+  };
+  try{ sessionStorage.setItem(ACTIVE_KEY, activeId); }catch(e){}
+  saveState();
+  updateNav();
+  renderWelcomeGrid();
+  showMap();
+}
+
+function updateNav(){
+  document.getElementById('nav-xp').textContent = state.xp + ' XP';
+  const done = Object.values(state.modules).filter(m=>m.completed).length;
+  document.getElementById('nav-progress-text').textContent = done+'/'+MODULES.length;
+  document.getElementById('mini-fill').style.width = (done/MODULES.length*100)+'%';
+}
+
+function renderWelcomeGrid(){
+  const g = document.getElementById('welcome-grid');
+  g.innerHTML = MODULES.map((m,i)=>{
+    const done = state.modules[m.id]?.completed;
+    return `<div class="module-preview ${done?'done':''}" onclick="">
+      <div class="module-num">${String(i+1).padStart(2,'0')}</div>
+      <div class="module-preview-title">${m.title}</div>
+      <div class="status-dot"></div>
+    </div>`;
+  }).join('');
+}
+
+function renderMap(){
+  updateNav();
+  const map = document.getElementById('journey-map');
+  const doneCount = Object.values(state.modules).filter(m=>m.completed).length;
+  map.innerHTML = MODULES.map((m,i)=>{
+    const done = state.modules[m.id]?.completed;
+    const locked = i > doneCount;
+    const isCurrent = i === doneCount;
+    let cls = done?'completed':locked?'locked':isCurrent?'active-level':'';
+    return `<div class="level-card ${cls}" onclick="${locked?'':('loadModule('+i+')')}">
+      <div class="level-icon" style="background:${m.bgColor}">${m.emoji}</div>
+      <div class="level-info">
+        <div class="level-title">${m.tag}: ${m.title}</div>
+        <div class="level-desc">${m.intro.substring(0,80)}...</div>
+      </div>
+      <div class="level-right">
+        <div class="level-xp">+${m.xp} XP</div>
+        ${done?'<div class="check-icon">✅</div>':locked?'<div class="lock-icon">🔒</div>':'<div style="font-size:0.75rem;color:var(--teal)">▶ Play</div>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function loadModule(idx){
+  state.currentModule = idx;
+  const m = MODULES[idx];
+  moduleStartTime = Date.now();
+  quizPassed = false;
+
+  document.getElementById('mod-tag').textContent = m.tag + ' · ' + m.emoji;
+  document.getElementById('mod-title').textContent = m.title;
+  document.getElementById('mod-intro').textContent = m.intro;
+  document.getElementById('mod-content').innerHTML = m.renderContent();
+
+  renderQuiz(m.quiz, idx);
+
+  document.getElementById('completion-zone').style.display = 'none';
+  showScreen('module');
+}
+
+function nextModule(){
+  const next = state.currentModule + 1;
+  if(next >= MODULES.length){
+    showFinalScreen();
+  } else {
+    showMap();
+  }
+}
+
+// ══════════════════════════════════════════════
+//  QUIZ RENDERERS
+// ══════════════════════════════════════════════
+function renderQuiz(quiz, modIdx){
+  const container = document.getElementById('quiz-container');
+  if(quiz.type === 'mcq') container.innerHTML = renderMCQ(quiz);
+  else if(quiz.type === 'sort') container.innerHTML = renderSort(quiz);
+  else if(quiz.type === 'spot') container.innerHTML = renderSpot(quiz);
+  else if(quiz.type === 'rapidfire') container.innerHTML = renderRapidFire(quiz);
+  else if(quiz.type === 'investigation') container.innerHTML = renderInvestigation(quiz);
+}
+
+// — MCQ —
+function renderMCQ(quiz){
+  return `<div class="quiz-zone">
+    <div class="quiz-header">
+      <div class="quiz-badge">🎮 SITUATION QUIZ</div>
+      <div class="quiz-header-title">Test Your Understanding</div>
+    </div>
+    <div class="quiz-scenario">${quiz.scenario}</div>
+    <div class="quiz-question">${quiz.question}</div>
+    <div class="quiz-options" id="mcq-options">
+      ${quiz.options.map((o,i)=>`
+        <div class="quiz-option" id="opt-${i}" onclick="checkMCQ(${i})">
+          <div class="opt-letter">${o.letter}</div>
+          <span>${o.text}</span>
+        </div>`).join('')}
+    </div>
+    <div class="quiz-feedback" id="mcq-feedback"></div>
+  </div>`;
+}
+
+window._mcqData = null;
+function checkMCQ(idx){
+  const quiz = MODULES[state.currentModule].quiz;
+  window._mcqData = quiz;
+  const opt = quiz.options[idx];
+  const el = document.getElementById('opt-'+idx);
+  const fb = document.getElementById('mcq-feedback');
+
+  if(opt.correct){
+    el.classList.add('correct');
+    document.querySelectorAll('.quiz-option').forEach((o,i)=>{ if(i!==idx) o.classList.add('disabled'); });
+    fb.innerHTML = opt.feedback;
+    fb.className = 'quiz-feedback show good';
+    recordAttempt(true);
+    setTimeout(()=>completeModule(), 1200);
+  } else {
+    el.classList.add('wrong');
+    fb.innerHTML = `<span class="try-again-msg">🔄 Try Again!</span> — ${opt.feedback}`;
+    fb.className = 'quiz-feedback show bad';
+    recordAttempt(false);
+    setTimeout(()=>{ el.classList.remove('wrong'); fb.className='quiz-feedback'; }, 1800);
+  }
+}
+
+// — SORT GAME —
+function renderSort(quiz){
+  return `<div class="quiz-zone">
+    <div class="quiz-header">
+      <div class="quiz-badge">🎮 SORT GAME</div>
+      <div class="quiz-header-title">Do's & Don'ts Sorter</div>
+    </div>
+    <div class="quiz-scenario">${quiz.instruction}</div>
+    <div class="sort-game">
+      <div class="sort-items" id="sort-pool">
+        ${quiz.items.map(item=>`<div class="sort-item" id="si-${item.id}" onclick="selectSortItem('${item.id}')" data-id="${item.id}">${item.text}</div>`).join('')}
+      </div>
+      <div class="sort-buckets">
+        <div class="sort-bucket bucket-do" id="bucket-do" onclick="placeSortItem('do')">
+          <div class="bucket-title">✅ DO</div>
+          <div class="bucket-items" id="bucket-do-items"></div>
+        </div>
+        <div class="sort-bucket bucket-dont" id="bucket-dont" onclick="placeSortItem('dont')">
+          <div class="bucket-title">❌ DON'T</div>
+          <div class="bucket-items" id="bucket-dont-items"></div>
+        </div>
+      </div>
+      <button class="sort-check-btn" id="sort-check-btn" onclick="checkSort()" disabled>Check My Answers ✓</button>
+    </div>
+    <div class="quiz-feedback" id="sort-feedback"></div>
+  </div>`;
+}
+
+let selectedSortItem = null;
+let sortPlacements = {};
+window.selectSortItem = function(id){
+  document.querySelectorAll('.sort-item').forEach(el=>el.classList.remove('selected'));
+  if(selectedSortItem === id){ selectedSortItem=null; return; }
+  selectedSortItem = id;
+  document.getElementById('si-'+id).classList.add('selected');
+  document.getElementById('bucket-do').classList.add('highlight');
+  document.getElementById('bucket-dont').classList.add('highlight');
+}
+window.placeSortItem = function(bucket){
+  if(!selectedSortItem) return;
+  const id = selectedSortItem;
+  const quiz = MODULES[state.currentModule].quiz;
+  const item = quiz.items.find(i=>i.id===id);
+  sortPlacements[id] = bucket;
+  document.getElementById('si-'+id).classList.add('placed');
+  document.getElementById('si-'+id).classList.remove('selected');
+  const bItems = document.getElementById('bucket-'+bucket+'-items');
+  bItems.innerHTML += `<div class="bucket-chip" id="bc-${id}">${item.text.substring(0,30)}… <span class="remove-chip" onclick="removeSortItem('${id}','${bucket}')">✕</span></div>`;
+  selectedSortItem = null;
+  document.getElementById('bucket-do').classList.remove('highlight');
+  document.getElementById('bucket-dont').classList.remove('highlight');
+  const placed = Object.keys(sortPlacements).length;
+  document.getElementById('sort-check-btn').disabled = placed < quiz.items.length;
+}
+window.removeSortItem = function(id, bucket){
+  delete sortPlacements[id];
+  document.getElementById('si-'+id).classList.remove('placed','selected');
+  const chip = document.getElementById('bc-'+id);
+  if(chip) chip.remove();
+  document.getElementById('sort-check-btn').disabled = true;
+  event.stopPropagation();
+}
+window.checkSort = function(){
+  const quiz = MODULES[state.currentModule].quiz;
+  let wrong = [];
+  quiz.items.forEach(item=>{
+    if(sortPlacements[item.id] !== item.category) wrong.push(item.id);
+  });
+  if(wrong.length === 0){
+    const fb = document.getElementById('sort-feedback');
+    fb.innerHTML = '✅ Perfect! You correctly sorted all items. You clearly know your Do\'s and Don\'ts!';
+    fb.className = 'quiz-feedback show good';
+    recordAttempt(true);
+    setTimeout(()=>completeModule(), 1200);
+  } else {
+    recordAttempt(false);
+    wrong.forEach(id=>{
+      const el = document.getElementById('bc-'+id);
+      if(el) el.style.background='rgba(255,107,107,0.2)';
+    });
+    const fb = document.getElementById('sort-feedback');
+    fb.innerHTML = `<span class="try-again-msg">🔄 Try Again!</span> — ${wrong.length} item(s) are in the wrong bucket. Remove the highlighted chips and try again!`;
+    fb.className = 'quiz-feedback show bad';
+    // Reset wrong ones
+    wrong.forEach(id=>{
+      delete sortPlacements[id];
+      const chip = document.getElementById('bc-'+id);
+      if(chip){ setTimeout(()=>chip.remove(), 800); }
+      setTimeout(()=>{ document.getElementById('si-'+id).classList.remove('placed'); }, 900);
+    });
+    setTimeout(()=>{ document.getElementById('sort-check-btn').disabled = true; fb.className='quiz-feedback'; }, 2000);
+  }
+}
+
+// — SPOT THE VIOLATION —
+function renderSpot(quiz){
+  return `<div class="quiz-zone">
+    <div class="quiz-header">
+      <div class="quiz-badge">🔎 DETECTIVE MODE</div>
+      <div class="quiz-header-title">Spot the Violations</div>
+    </div>
+    <div class="quiz-scenario">${quiz.intro}</div>
+    <div class="spot-list" id="spot-list">
+      ${quiz.items.map(item=>`
+        <div class="spot-item" id="spot-${item.id}" onclick="toggleSpot('${item.id}')">
+          <span class="spot-icon" id="spot-icon-${item.id}">🔲</span>
+          <span>${item.text}</span>
+        </div>`).join('')}
+    </div>
+    <button class="sort-check-btn" onclick="checkSpot()">${quiz.submitLabel}</button>
+    <div class="quiz-feedback" id="spot-feedback"></div>
+  </div>`;
+}
+let spotSelected = new Set();
+window.toggleSpot = function(id){
+  if(spotSelected.has(id)){ spotSelected.delete(id); document.getElementById('spot-icon-'+id).textContent='🔲'; document.getElementById('spot-'+id).classList.remove('flagged-right','flagged-wrong'); }
+  else{ spotSelected.add(id); document.getElementById('spot-icon-'+id).textContent='🚩'; }
+}
+window.checkSpot = function(){
+  const quiz = MODULES[state.currentModule].quiz;
+  const violations = new Set(quiz.items.filter(i=>i.violation).map(i=>i.id));
+  let allRight = true;
+  let missed = 0; let wrongFlag = 0;
+  // Check wrong flags
+  spotSelected.forEach(id=>{
+    const item = quiz.items.find(i=>i.id===id);
+    if(!item.violation){ wrongFlag++; allRight=false; document.getElementById('spot-'+id).classList.add('flagged-wrong'); document.getElementById('spot-icon-'+id).textContent='❌'; }
+    else { document.getElementById('spot-'+id).classList.add('flagged-right'); document.getElementById('spot-icon-'+id).textContent='✅'; }
+  });
+  // Check missed
+  violations.forEach(id=>{ if(!spotSelected.has(id)){ missed++; allRight=false; document.getElementById('spot-'+id).classList.add('missed'); document.getElementById('spot-icon-'+id).textContent='⚠️'; }});
+  const fb = document.getElementById('spot-feedback');
+  if(allRight && missed===0 && wrongFlag===0){
+    fb.innerHTML = '✅ Outstanding detective work! You correctly identified all 4 violations and cleared the innocent claims.';
+    fb.className = 'quiz-feedback show good';
+    recordAttempt(true);
+    setTimeout(()=>completeModule(), 1400);
+  } else {
+    recordAttempt(false);
+    fb.innerHTML = `<span class="try-again-msg">🔄 Try Again!</span> — You missed ${missed} violation(s) and incorrectly flagged ${wrongFlag} valid claim(s). Review the highlighted items and try again.`;
+    fb.className = 'quiz-feedback show bad';
+    setTimeout(()=>{
+      spotSelected.forEach(id=>{ document.getElementById('spot-'+id).classList.remove('flagged-right','flagged-wrong'); document.getElementById('spot-icon-'+id).textContent='🔲'; });
+      quiz.items.forEach(i=>{ document.getElementById('spot-'+i.id).classList.remove('missed'); if(!spotSelected.has(i.id)) document.getElementById('spot-icon-'+i.id).textContent='🔲'; });
+      spotSelected.clear();
+      fb.className='quiz-feedback';
+    }, 2500);
+  }
+}
+
+// — RAPID FIRE T/F —
+let rfIndex = 0;
+let rfResults = [];
+function renderRapidFire(quiz){
+  rfIndex = 0; rfResults = [];
+  return `<div class="quiz-zone">
+    <div class="quiz-header">
+      <div class="quiz-badge">⚡ RAPID FIRE</div>
+      <div class="quiz-header-title">True or False — Fuel Edition</div>
+    </div>
+    <div class="quiz-scenario">Answer TRUE or FALSE for each fuel claim scenario. You must get them all correct to proceed!</div>
+    <div class="rf-progress" id="rf-progress">
+      ${quiz.questions.map((_,i)=>`<div class="rf-dot ${i===0?'current':''}" id="rfd-${i}"></div>`).join('')}
+    </div>
+    <div id="rf-question-area">${renderRFQuestion(quiz, 0)}</div>
+    <div class="quiz-feedback" id="rf-feedback"></div>
+  </div>`;
+}
+function renderRFQuestion(quiz, idx){
+  const q = quiz.questions[idx];
+  return `<div>
+    <div class="quiz-question" style="margin-bottom:20px">[${idx+1}/${quiz.questions.length}] ${q.q}</div>
+    <div class="tf-options">
+      <button class="tf-btn true-btn" id="tf-true" onclick="answerRF(true)">✅ TRUE</button>
+      <button class="tf-btn false-btn" id="tf-false" onclick="answerRF(false)">❌ FALSE</button>
+    </div>
+  </div>`;
+}
+window.answerRF = function(answer){
+  const quiz = MODULES[state.currentModule].quiz;
+  const q = quiz.questions[rfIndex];
+  const correct = answer === q.answer;
+  const btn = document.getElementById(answer ? 'tf-true' : 'tf-false');
+  btn.classList.add('disabled');
+  const fb = document.getElementById('rf-feedback');
+  if(correct){
+    btn.classList.add('correct');
+    document.getElementById('rfd-'+rfIndex).classList.remove('current');
+    document.getElementById('rfd-'+rfIndex).classList.add('done-right');
+    fb.innerHTML = '✅ ' + q.explain;
+    fb.className = 'quiz-feedback show good';
+    rfResults.push(true);
+    rfIndex++;
+    setTimeout(()=>{
+      fb.className='quiz-feedback';
+      if(rfIndex < quiz.questions.length){
+        document.getElementById('rf-question-area').innerHTML = renderRFQuestion(quiz, rfIndex);
+        document.getElementById('rfd-'+rfIndex).classList.add('current');
+      } else {
+        recordAttempt(true);
+        completeModule();
+      }
+    }, 1500);
+  } else {
+    btn.classList.add('wrong');
+    document.getElementById('rfd-'+rfIndex).classList.add('done-wrong');
+    fb.innerHTML = `<span class="try-again-msg">🔄 Try Again!</span> — ${q.explain}`;
+    fb.className = 'quiz-feedback show bad';
+    recordAttempt(false);
+    setTimeout(()=>{
+      btn.classList.remove('wrong','disabled');
+      document.getElementById('rfd-'+rfIndex).classList.remove('done-wrong');
+      document.getElementById('rfd-'+rfIndex).classList.add('current');
+      fb.className='quiz-feedback';
+    }, 2000);
+  }
+}
+
+// — INVESTIGATION —
+function renderInvestigation(quiz){
+  return `<div class="quiz-zone">
+    <div class="quiz-header">
+      <div class="quiz-badge">🕵️ INVESTIGATION BOARD</div>
+      <div class="quiz-header-title">Classify the Violations</div>
+    </div>
+    <div class="quiz-scenario">${quiz.intro}</div>
+    <div class="inv-board">
+      <div class="inv-items" id="inv-items">
+        ${quiz.items.map(item=>`
+          <div class="inv-item" id="inv-${item.id}">
+            <div class="inv-item-desc">${item.desc}</div>
+            <select class="inv-item-select" id="inv-sel-${item.id}">
+              <option value="">— Select —</option>
+              ${item.options.map(o=>`<option value="${o.v}">${o.l}</option>`).join('')}
+            </select>
+          </div>`).join('')}
+      </div>
+      <button class="inv-check-btn" onclick="checkInvestigation()">🔍 Submit Classification</button>
+    </div>
+    <div class="quiz-feedback" id="inv-feedback"></div>
+  </div>`;
+}
+window.checkInvestigation = function(){
+  const quiz = MODULES[state.currentModule].quiz;
+  let allCorrect = true;
+  let wrongItems = [];
+  quiz.items.forEach(item=>{
+    const sel = document.getElementById('inv-sel-'+item.id).value;
+    const row = document.getElementById('inv-'+item.id);
+    row.classList.remove('correct-row','wrong-row');
+    if(sel === item.answer){ row.classList.add('correct-row'); }
+    else { row.classList.add('wrong-row'); allCorrect=false; wrongItems.push(item.id); }
+  });
+  const fb = document.getElementById('inv-feedback');
+  if(allCorrect){
+    fb.innerHTML = '✅ Brilliant investigative work! You correctly classified all violations. You\'re ready to be a compliance champion!';
+    fb.className = 'quiz-feedback show good';
+    recordAttempt(true);
+    setTimeout(()=>completeModule(), 1300);
+  } else {
+    recordAttempt(false);
+    fb.innerHTML = `<span class="try-again-msg">🔄 Try Again!</span> — ${wrongItems.length} item(s) are misclassified (highlighted in red). Review and try again.`;
+    fb.className = 'quiz-feedback show bad';
+    setTimeout(()=>{
+      wrongItems.forEach(id=>{ 
+        document.getElementById('inv-'+id).classList.remove('wrong-row');
+        document.getElementById('inv-sel-'+id).value = '';
+      });
+      fb.className='quiz-feedback';
+    }, 2200);
+  }
+}
+
+// ══════════════════════════════════════════════
+//  COMPLETION
+// ══════════════════════════════════════════════
+function recordAttempt(correct){
+  const m = MODULES[state.currentModule];
+  state.quizAttempts.push({
+    moduleId: m.id,
+    correct,
+    timestamp: new Date().toISOString()
+  });
+  if(!correct) state.totalWrongAttempts++;
+  saveState();
+}
+
+function completeModule(){
+  if(quizPassed) return;
+  quizPassed = true;
+  const m = MODULES[state.currentModule];
+  const timeSpent = Math.round((Date.now() - moduleStartTime) / 1000);
+  
+  if(!state.modules[m.id]?.completed){
+    state.xp += m.xp;
+    state.modules[m.id] = {
+      completed: true,
+      xp: m.xp,
+      completedAt: new Date().toISOString(),
+      timeSpent
+    };
+    saveState();
+    updateNav();
+  }
+
+  const zone = document.getElementById('completion-zone');
+  document.getElementById('completion-emoji').textContent = m.emoji + '🎉';
+  document.getElementById('completion-title').textContent = 'Module Complete!';
+  document.getElementById('completion-text').textContent = `You've mastered: ${m.title}`;
+  document.getElementById('xp-earned').textContent = `+${m.xp} XP Earned · ${m.badge}`;
+
+  const isLast = state.currentModule === MODULES.length - 1;
+  const btn = zone.querySelector('.btn-continue');
+  btn.textContent = isLast ? '🏆 Finish & Claim Trophy →' : 'Continue to Next Module →';
+
+  zone.style.display = 'block';
+  zone.scrollIntoView({behavior:'smooth', block:'center'});
+  shootConfetti();
+}
+
+function showFinalScreen(){
+  const done = Object.values(state.modules).filter(m=>m.completed).length;
+  const attempts = state.quizAttempts;
+  const correctAttempts = attempts.filter(a=>a.correct).length;
+  const score = attempts.length>0 ? Math.round((correctAttempts/attempts.length)*100) : 100;
+  
+  document.getElementById('final-name').textContent = state.learnerName || 'Champion';
+  document.getElementById('final-xp').textContent = state.xp;
+  document.getElementById('final-modules').textContent = done;
+  document.getElementById('final-score').textContent = score + '%';
+  
+  document.getElementById('badges-container').innerHTML = MODULES.map(m=>`<div class="badge-chip">${m.badge}</div>`).join('');
+  
+  showScreen('complete');
+  shootConfetti(100);
+}
+
+function restartAll(){
+  // Clear this session — other learners stay in the roster
+  activeId = null;
+  state = { learnerId:null, learnerName:'', startTime:null, xp:0, modules:{}, quizAttempts:[], currentModule:0, totalWrongAttempts:0 };
+  try{ sessionStorage.removeItem(ACTIVE_KEY); }catch(e){}
+  document.getElementById('learner-name').value = '';
+  renderWelcomeGrid();
+  showScreen('welcome');
+}
+
+// ══════════════════════════════════════════════
+//  CONFETTI
+// ══════════════════════════════════════════════
+function shootConfetti(count=40){
+  const container = document.getElementById('confetti-container');
+  container.innerHTML = '';
+  const colors = ['#00c2d4','#f5c518','#ff6b6b','#22d98a','#845ef7','#a78bfa'];
+  for(let i=0; i<count; i++){
+    const p = document.createElement('div');
+    p.className = 'conf-piece';
+    const x = Math.random()*100;
+    const drift = (Math.random()-0.5)*100;
+    p.style.cssText = `background:${colors[Math.floor(Math.random()*colors.length)]};--x:${x}%;--drift:${drift}px;--dur:${1.5+Math.random()*2}s;--del:${Math.random()*0.8}s;border-radius:${Math.random()>0.5?'50%':'2px'}`;
+    container.appendChild(p);
+  }
+  setTimeout(()=>{ container.innerHTML=''; }, 3000);
+}
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+updateNav();
+renderWelcomeGrid();
+</script>
+</body>
+</html>
