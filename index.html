@@ -386,7 +386,7 @@
 //  GOOGLE SHEETS CONFIG
 //  Paste your Apps Script URL below (Step 2 of setup guide)
 // ══════════════════════════════════════════════
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNZ791Xkofb2OgML1Ipn2I5t7qVQWzKwszrzNfClhkuhaTVwBAsqbY_9_0NQXSYSbWKw/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw7orz_2gOZbY3OMoP-6GOF9gAQsyholajSGcwCyu2_By-khCT5UH5TGqSlGaXMxsp1ug/exec';
 
 // ── State ───────────────────────────────────────
 function genId(){ return 'L_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
@@ -415,7 +415,7 @@ function saveState(){
   // Debounce sheet writes — max once per 3 seconds
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
-    if(APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbzNZ791Xkofb2OgML1Ipn2I5t7qVQWzKwszrzNfClhkuhaTVwBAsqbY_9_0NQXSYSbWKw/exec') return;
+    if(APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbw7orz_2gOZbY3OMoP-6GOF9gAQsyholajSGcwCyu2_By-khCT5UH5TGqSlGaXMxsp1ug/exec') return;
     const payload = {
       learnerId: activeId,
       learnerName: state.learnerName,
@@ -427,12 +427,13 @@ function saveState(){
       currentModule: state.currentModule,
       totalWrongAttempts: state.totalWrongAttempts
     };
-    // Use text/plain to avoid CORS preflight — Apps Script handles both
+    // mode:'no-cors' = fire-and-forget — browser sends it, Apps Script receives it,
+    // we don't read the response. This is the only reliable way to POST to Apps Script.
     fetch(APPS_SCRIPT_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
+      mode: 'no-cors',
       body: JSON.stringify(payload)
-    }).catch(() => {}); // silent fail — session storage keeps data safe
+    }).catch(() => {});
   }, 3000);
 }
 
