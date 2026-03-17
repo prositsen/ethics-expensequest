@@ -251,7 +251,7 @@ tr:hover td{background:rgba(240,244,255,.6);}
 // ══════════════════════════════════════════════
 //  CONFIG — paste same URL as in learning module
 // ══════════════════════════════════════════════
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNZ791Xkofb2OgML1Ipn2I5t7qVQWzKwszrzNfClhkuhaTVwBAsqbY_9_0NQXSYSbWKw/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw7orz_2gOZbY3OMoP-6GOF9gAQsyholajSGcwCyu2_By-khCT5UH5TGqSlGaXMxsp1ug/exec';
 
 // ══════════════════════════════════════════════
 //  ADMIN PASSWORD — change this to your password
@@ -315,7 +315,8 @@ function initDashboard(){
 async function fetchData(showLoader){
   if(showLoader) document.getElementById('loading-overlay').classList.remove('hidden');
   try {
-    const res = await fetch(APPS_SCRIPT_URL + '?action=getAll', { redirect: 'follow' });
+    // Cache-buster ensures we always get fresh data, not a cached response
+    const res = await fetch(APPS_SCRIPT_URL + '?action=getAll&_=' + Date.now(), { redirect: 'follow' });
     if(!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     allLearners = Array.isArray(data) ? data : [];
@@ -555,7 +556,7 @@ function exportAll(){
   const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='ethics-quest-learners-'+new Date().toISOString().slice(0,10)+'.json';a.click();
 }
 function openSheet(){
-  if(APPS_SCRIPT_URL==='https://script.google.com/macros/s/AKfycbzNZ791Xkofb2OgML1Ipn2I5t7qVQWzKwszrzNfClhkuhaTVwBAsqbY_9_0NQXSYSbWKw/exec'){ alert('Configure Apps Script URL first.'); return; }
+  if(APPS_SCRIPT_URL==='https://script.google.com/macros/s/AKfycbw7orz_2gOZbY3OMoP-6GOF9gAQsyholajSGcwCyu2_By-khCT5UH5TGqSlGaXMxsp1ug/exec'){ alert('Configure Apps Script URL first.'); return; }
   window.open('https://docs.google.com/spreadsheets','_blank');
 }
 </script>
