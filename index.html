@@ -384,11 +384,13 @@
 <script>
 // ══════════════════════════════════════════════
 //  GOOGLE SHEETS CONFIG
-//  Paste your Apps Script URL below (Step 2 of setup guide)
 // ══════════════════════════════════════════════
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw7orz_2gOZbY3OMoP-6GOF9gAQsyholajSGcwCyu2_By-khCT5UH5TGqSlGaXMxsp1ug/exec';
 
-// ── State ───────────────────────────────────────
+// ── Session key ────────────────────────────────
+const SESSION_KEY = 'eq_session';
+
+// ── State ──────────────────────────────────────
 function genId(){ return 'L_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
 
 let activeId = null;
@@ -397,44 +399,54 @@ let state = {
   xp: 0, modules: {}, quizAttempts: [], currentModule: 0, totalWrongAttempts: 0
 };
 
-// ── Restore session (survives page refresh) ──────
+// ── Restore session on page refresh ────────────
 function loadState(){
   try {
-    const saved = sessionStorage.getItem('eq_session');
-    if(saved){ const d = JSON.parse(saved); activeId = d.learnerId; Object.assign(state, d); }
+    const saved = sessionStorage.getItem(SESSION_KEY);
+    if(saved){
+      const d = JSON.parse(saved);
+      activeId = d.learnerId || null;
+      Object.assign(state, d);
+    }
   } catch(e){}
 }
 
-// ── Save to Google Sheet ─────────────────────────
+// ── XHR send to Apps Script ─────────────────────
+// Uses XHR (not fetch) because Apps Script issues a 301 redirect.
+// fetch with no-cors drops the POST body on that redirect.
+// XHR follows the redirect and keeps the body intact.
+function sendToSheet(payload){
+  try {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', APPS_SCRIPT_URL, true);
+    xhr.send(JSON.stringify(payload));
+  } catch(e){}
+}
+
+// ── Save: local immediately, sheet after 2 seconds ─
 let saveTimer = null;
 function saveState(){
   if(!activeId) return;
   state.lastActive = new Date().toISOString();
-  // Instant local backup (survives refresh)
-  try{ sessionStorage.setItem('eq_session', JSON.stringify(state)); }catch(e){}
-  // Debounce sheet writes — max once per 3 seconds
+
+  // Always write to sessionStorage instantly (survives page refresh)
+  try{ sessionStorage.setItem(SESSION_KEY, JSON.stringify(state)); }catch(e){}
+
+  // Debounce — send to sheet 2s after last change
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
-    if(APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbw7orz_2gOZbY3OMoP-6GOF9gAQsyholajSGcwCyu2_By-khCT5UH5TGqSlGaXMxsp1ug/exec') return;
-    const payload = {
-      learnerId: activeId,
-      learnerName: state.learnerName,
-      startTime: state.startTime,
-      lastActive: state.lastActive,
-      xp: state.xp,
-      modules: state.modules,
-      quizAttempts: state.quizAttempts,
-      currentModule: state.currentModule,
+    sendToSheet({
+      learnerId:          activeId,
+      learnerName:        state.learnerName,
+      startTime:          state.startTime,
+      lastActive:         state.lastActive,
+      xp:                 state.xp,
+      modules:            state.modules,
+      quizAttempts:       state.quizAttempts,
+      currentModule:      state.currentModule,
       totalWrongAttempts: state.totalWrongAttempts
-    };
-    // mode:'no-cors' = fire-and-forget — browser sends it, Apps Script receives it,
-    // we don't read the response. This is the only reliable way to POST to Apps Script.
-    fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      body: JSON.stringify(payload)
-    }).catch(() => {});
-  }, 3000);
+    });
+  }, 2000);
 }
 
 loadState();
@@ -755,7 +767,7 @@ function startLearning(){
     startTime: new Date().toISOString(), lastActive: new Date().toISOString(),
     xp: 0, modules: {}, quizAttempts: [], currentModule: 0, totalWrongAttempts: 0
   };
-  try{ sessionStorage.setItem(ACTIVE_KEY, activeId); }catch(e){}
+  try{ sessionStorage.setItem(SESSION_KEY, JSON.stringify(state)); }catch(e){}
   saveState();
   updateNav();
   renderWelcomeGrid();
@@ -1227,7 +1239,7 @@ function restartAll(){
   // Clear this session — other learners stay in the roster
   activeId = null;
   state = { learnerId:null, learnerName:'', startTime:null, xp:0, modules:{}, quizAttempts:[], currentModule:0, totalWrongAttempts:0 };
-  try{ sessionStorage.removeItem(ACTIVE_KEY); }catch(e){}
+  try{ sessionStorage.removeItem(SESSION_KEY); }catch(e){}
   document.getElementById('learner-name').value = '';
   renderWelcomeGrid();
   showScreen('welcome');
